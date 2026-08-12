@@ -14,5 +14,6 @@ RUN go build -o bin/blog-api ./cmd/blog-api
 FROM alpine
 
 COPY --from=builder /app/bin/blog-api /blog-api
+COPY --from=builder /app/.env .env
 
 CMD [ "/blog-api" ]

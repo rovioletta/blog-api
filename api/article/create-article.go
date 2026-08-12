@@ -8,4 +8,5 @@ func (s *ArticleServer) CreateArticle(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("success"))
 
 	// Insert data
+	// TODO
 }

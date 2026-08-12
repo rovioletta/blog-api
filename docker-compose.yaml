@@ -6,6 +6,9 @@ services:
       - "8081:${APP_PORT:-8081}"
     env_file:
       - .env
+    depends_on:
+      db:
+        condition: service_healthy
 
   db:
     image: postgres
@@ -15,10 +18,23 @@ services:
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
       POSTGRES_USER: ${POSTGRES_USER:-user}
-      POSTGRES_DATABASE: ${POSTGRES_DATABASE:-articles}
+      POSTGRES_DB: ${POSTGRES_DATABASE:-blog-api}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-user} -d ${POSTGRES_DATABASE:-blog-api}"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
 
   adminer:
     image: adminer
     restart: always
     ports:
       - 8080:8080
+
+volumes:
+  postgres_data:
