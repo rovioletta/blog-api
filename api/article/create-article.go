@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-func (s *ArticleServer) CreateArticle(w http.ResponseWriter, r *http.Request) {
+func (s *ArticleAPI) CreateArticle(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("success"))
 
 	// Insert data

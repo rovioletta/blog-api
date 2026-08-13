@@ -3,28 +3,29 @@
   "sql": [
     {
       "engine": "postgresql",
-      "schema": "../init.sql",
+      "schema": "../../init.sql",
       "gen": {
         "go": {
           "package": "db",
-          "out": "../../internal/database",
+          "out": "../../internal/db",
           "sql_package": "pgx/v5",
           "query_parameter_limit": 2,
-          "emit_result_struct_pointers": true,
-          "emit_params_struct_pointers": true
+          "emit_pointers_for_null_types": true,
+          "emit_params_struct_pointers": true,
+          "overrides": [
+            {
+              "db_type": "pg_catalog.timestamp",
+              "nullable": true,
+              "go_type": {
+                "import": "time",
+                "type": "Time",
+                "pointer": true
+              }
+            }
+          ]
         }
       },
-      "queries": "../../internal/database/queries"
+      "queries": "../../internal/db/queries"
     }
-  ],
-  "overrides": {
-    "go": {
-      "overrides": [
-        {
-          "db_type": "pg_catalog.timestamp",
-          "go_type": "time.Time"
-        }
-      ]
-    }
-  }
+  ]
 }

@@ -1,18 +1,24 @@
 package article
 
 import (
+	"context"
 	"log/slog"
-	"rovioletta/blog-api/internal/database"
+
+	"rovioletta/blog-api/internal/model"
 )
 
-type ArticleServer struct {
-	logger *slog.Logger
-	db     *database.DB
+type ArticleServiceInterface interface {
+	CreateArticle(ctx context.Context, article *model.Article) error
 }
 
-func InitArticleServer(logger *slog.Logger, db *database.DB) *ArticleServer {
-	return &ArticleServer{
+type ArticleAPI struct {
+	logger *slog.Logger
+	server ArticleServiceInterface
+}
+
+func NewArticleAPI(logger *slog.Logger, server ArticleServiceInterface) *ArticleAPI {
+	return &ArticleAPI{
 		logger: logger,
-		db:     db,
+		server: server,
 	}
 }

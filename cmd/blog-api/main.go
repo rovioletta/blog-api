@@ -5,12 +5,12 @@ import (
 	"net/http"
 	"os"
 
-	"rovioletta/blog-api/api/article"
-	"rovioletta/blog-api/internal/database"
-
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/joho/godotenv"
+	article_api "rovioletta/blog-api/api/article"
+	"rovioletta/blog-api/internal/article"
+	database "rovioletta/blog-api/internal/db"
 )
 
 func main() {
@@ -32,10 +32,11 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	db := database.InitDB(logger)
+	db := database.NewDB(logger)
 	defer db.CloseDB()
 
-	articleAPI := article.InitArticleServer(logger, db)
+	articleServer := article.NewArticleService(db)
+	articleAPI := article_api.NewArticleAPI(logger, articleServer)
 
 	r.Post("/article", articleAPI.CreateArticle)
 
