@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 
+	"github.com/go-playground/validator/v10"
 	"rovioletta/blog-api/internal/model"
 )
 
@@ -12,13 +13,17 @@ type ArticleServiceInterface interface {
 }
 
 type ArticleAPI struct {
-	logger *slog.Logger
-	server ArticleServiceInterface
+	logger    *slog.Logger
+	validator *validator.Validate
+	server    ArticleServiceInterface
 }
 
 func NewArticleAPI(logger *slog.Logger, server ArticleServiceInterface) *ArticleAPI {
+	var v = validator.New(validator.WithRequiredStructEnabled())
+
 	return &ArticleAPI{
-		logger: logger,
-		server: server,
+		validator: v,
+		logger:    logger,
+		server:    server,
 	}
 }
