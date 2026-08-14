@@ -9,7 +9,7 @@ import (
 )
 
 type Article struct {
-	ID        int32
+	ID        uint64
 	Title     string
 	Content   string
 	Tags      []string

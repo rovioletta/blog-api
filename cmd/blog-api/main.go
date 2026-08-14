@@ -39,6 +39,7 @@ func main() {
 	articleAPI := article_api.NewArticleAPI(logger, articleServer)
 
 	r.Post("/article", articleAPI.CreateArticle)
+	r.Post("/article/list", articleAPI.GetArticlesByFilter)
 
 	if err := http.ListenAndServe(":"+os.Getenv("APP_PORT"), r); err != nil {
 		logger.Error("Unable to run the server", slog.String("error", err.Error()))

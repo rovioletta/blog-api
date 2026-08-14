@@ -10,6 +10,7 @@ import (
 
 type ArticleServiceInterface interface {
 	CreateArticle(ctx context.Context, article *model.Article) error
+	GetArticlesByFilter(ctx context.Context, filter *model.ArticleFilter) ([]model.Article, error)
 }
 
 type ArticleAPI struct {
