@@ -80,6 +80,10 @@
             {
               "db_type": "serial",
               "go_type": "uint64"
+            },
+            {
+              "db_type": "pg_catalog.int4",
+              "go_type": "uint64"
             }
           ]
         }

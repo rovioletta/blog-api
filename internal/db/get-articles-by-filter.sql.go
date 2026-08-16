@@ -16,38 +16,40 @@ SELECT
 FROM
   article
 WHERE
-  CASE
-    -- by title
-    WHEN $1 :: text IS NULL THEN TRUE
-    ELSE title LIKE $1
-  END
-  AND CASE
-    -- by tags
-    WHEN $2 :: text [] IS NULL
-    OR cardinality($2) IS NULL
-    OR cardinality($2) = 0 THEN TRUE
-    ELSE tags & & $2
-  END
-  AND CASE
-    -- by filter_created_from
-    WHEN $3 :: timestamp IS NULL THEN TRUE
-    ELSE created_at >= $3
-  END
-  AND CASE
-    -- by filter_created_to
-    WHEN $4 :: timestamp IS NULL THEN TRUE
-    ELSE created_at <= $4
-  END
-  AND CASE
-    -- by filter_updated_from
-    WHEN $5 :: timestamp IS NULL THEN TRUE
-    ELSE updated_at >= $5
-  END
-  AND CASE
-    -- by filter_updated_to
-    WHEN $6 :: timestamp IS NULL THEN TRUE
-    ELSE updated_at <= $6
-  END
+  -- by title
+  ($1::text IS NULL OR title LIKE $1::text)
+  
+  -- by tags
+  AND (
+    $2::text[] IS NULL 
+    OR cardinality($2::text[]) = 0 
+    OR tags && $2::text[]
+  )
+  
+  -- by created_at
+  AND ($3::timestamp IS NULL OR created_at >= $3::timestamp)
+  AND ($4::timestamp IS NULL OR created_at <= $4::timestamp)
+  
+  -- by updated_at
+  AND ($5::timestamp IS NULL OR updated_at >= $5::timestamp)
+  AND ($6::timestamp IS NULL OR updated_at <= $6::timestamp)
+ORDER BY
+  -- by title
+  CASE WHEN $7::text = 'title' AND $8::text = 'asc' THEN title END ASC,
+  CASE WHEN $7::text = 'title' AND $8::text = 'desc' THEN title END DESC,
+  
+  -- by created_at
+  CASE WHEN $7::text = 'created_at' AND $8::text = 'asc' THEN created_at END ASC,
+  CASE WHEN $7::text = 'created_at' AND $8::text = 'desc' THEN created_at END DESC,
+  
+  -- by updated_at
+  CASE WHEN $7::text = 'updated_at' AND $8::text = 'asc' THEN updated_at END ASC,
+  CASE WHEN $7::text = 'updated_at' AND $8::text = 'desc' THEN updated_at END DESC,
+  
+  -- default
+  created_at DESC
+LIMIT
+  $10::integer OFFSET $9::integer
 `
 
 type GetArticlesByFilterParams struct {
@@ -57,6 +59,10 @@ type GetArticlesByFilterParams struct {
 	FilterCreatedTo   time.Time
 	FilterUpdatedFrom time.Time
 	FilterUpdatedTo   time.Time
+	OrderByField      string
+	OrderType         string
+	OffsetPage        uint64
+	LimitPage         uint64
 }
 
 func (q *Queries) GetArticlesByFilter(ctx context.Context, arg *GetArticlesByFilterParams) ([]Article, error) {
@@ -67,6 +73,10 @@ func (q *Queries) GetArticlesByFilter(ctx context.Context, arg *GetArticlesByFil
 		arg.FilterCreatedTo,
 		arg.FilterUpdatedFrom,
 		arg.FilterUpdatedTo,
+		arg.OrderByField,
+		arg.OrderType,
+		arg.OffsetPage,
+		arg.LimitPage,
 	)
 	if err != nil {
 		return nil, err

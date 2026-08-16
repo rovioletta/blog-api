@@ -9,9 +9,18 @@ import (
 )
 
 func (s *ArticleService) GetArticlesByFilter(ctx context.Context, filter *model.ArticleFilter) ([]model.Article, error) {
-	// TODO insert filter paraments
-	// TODO add orderBy and pagination
-	raw, err := s.db.GetArticlesByFilter(ctx, &db.GetArticlesByFilterParams{})
+	raw, err := s.db.GetArticlesByFilter(ctx, &db.GetArticlesByFilterParams{
+		FilterSearchTitle: filter.Filter.SearchTitle,
+		FilterSearchTags:  filter.Filter.SearchTags,
+		FilterCreatedFrom: filter.Filter.CreatedFrom,
+		FilterCreatedTo:   filter.Filter.CreatedTo,
+		FilterUpdatedFrom: filter.Filter.UpdatedFrom,
+		FilterUpdatedTo:   filter.Filter.UpdatedTo,
+		OrderByField:      filter.Sort.Field,
+		OrderType:         filter.Sort.Order,
+		OffsetPage:        filter.Pagination.Offset,
+		LimitPage:         filter.Pagination.Limit,
+	})
 
 	if err != nil {
 		return nil, fmt.Errorf("s.db.GetArticlesByFilter: %v", err)

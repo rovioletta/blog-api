@@ -4,35 +4,37 @@ SELECT
 FROM
   article
 WHERE
-  CASE
-    -- by title
-    WHEN @filter_search_title :: text IS NULL THEN TRUE
-    ELSE title LIKE @filter_search_title
-  END
-  AND CASE
-    -- by tags
-    WHEN @filter_search_tags :: text [] IS NULL
-    OR cardinality(@filter_search_tags) IS NULL
-    OR cardinality(@filter_search_tags) = 0 THEN TRUE
-    ELSE tags & & @filter_search_tags
-  END
-  AND CASE
-    -- by filter_created_from
-    WHEN @filter_created_from :: timestamp IS NULL THEN TRUE
-    ELSE created_at >= @filter_created_from
-  END
-  AND CASE
-    -- by filter_created_to
-    WHEN @filter_created_to :: timestamp IS NULL THEN TRUE
-    ELSE created_at <= @filter_created_to
-  END
-  AND CASE
-    -- by filter_updated_from
-    WHEN @filter_updated_from :: timestamp IS NULL THEN TRUE
-    ELSE updated_at >= @filter_updated_from
-  END
-  AND CASE
-    -- by filter_updated_to
-    WHEN @filter_updated_to :: timestamp IS NULL THEN TRUE
-    ELSE updated_at <= @filter_updated_to
-  END;
+  -- by title
+  (@filter_search_title::text IS NULL OR title LIKE @filter_search_title::text)
+  
+  -- by tags
+  AND (
+    @filter_search_tags::text[] IS NULL 
+    OR cardinality(@filter_search_tags::text[]) = 0 
+    OR tags && @filter_search_tags::text[]
+  )
+  
+  -- by created_at
+  AND (@filter_created_from::timestamp IS NULL OR created_at >= @filter_created_from::timestamp)
+  AND (@filter_created_to::timestamp IS NULL OR created_at <= @filter_created_to::timestamp)
+  
+  -- by updated_at
+  AND (@filter_updated_from::timestamp IS NULL OR updated_at >= @filter_updated_from::timestamp)
+  AND (@filter_updated_to::timestamp IS NULL OR updated_at <= @filter_updated_to::timestamp)
+ORDER BY
+  -- by title
+  CASE WHEN @order_by_field::text = 'title' AND @order_type::text = 'asc' THEN title END ASC,
+  CASE WHEN @order_by_field::text = 'title' AND @order_type::text = 'desc' THEN title END DESC,
+  
+  -- by created_at
+  CASE WHEN @order_by_field::text = 'created_at' AND @order_type::text = 'asc' THEN created_at END ASC,
+  CASE WHEN @order_by_field::text = 'created_at' AND @order_type::text = 'desc' THEN created_at END DESC,
+  
+  -- by updated_at
+  CASE WHEN @order_by_field::text = 'updated_at' AND @order_type::text = 'asc' THEN updated_at END ASC,
+  CASE WHEN @order_by_field::text = 'updated_at' AND @order_type::text = 'desc' THEN updated_at END DESC,
+  
+  -- default
+  created_at DESC
+LIMIT
+  @limit_page::integer OFFSET @offset_page::integer;

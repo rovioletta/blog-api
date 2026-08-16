@@ -3,6 +3,7 @@ package article
 import (
 	"context"
 	"encoding/json"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -30,9 +31,9 @@ type Sort struct {
 }
 
 type GetArticlesByFilterRequestBody struct {
-	Filter     *Filter     `json:"filter"`
-	Pagination *Pagination `json:"pagination"`
-	Sort       []Sort      `json:"sort"`
+	Filter     *Filter    `json:"filter"`
+	Pagination Pagination `json:"pagination" validate:"required"`
+	Sort       *Sort      `json:"sort"`
 }
 
 func (a *ArticleAPI) GetArticlesByFilter(w http.ResponseWriter, r *http.Request) {
@@ -42,8 +43,33 @@ func (a *ArticleAPI) GetArticlesByFilter(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	// TODO: get articles
+	var filter *model.ParamsFilter
+	if body.Filter != nil {
+		filter = &model.ParamsFilter{
+			SearchTitle: body.Filter.SearchTitle,
+			SearchTags:  body.Filter.SearchTags,
+			CreatedFrom: body.Filter.CreatedFrom,
+			CreatedTo:   body.Filter.CreatedTo,
+			UpdatedFrom: body.Filter.UpdatedFrom,
+			UpdatedTo:   body.Filter.UpdatedTo,
+		}
+	}
+
+	var sort *model.Sort
+	if body.Sort != nil {
+		sort = &model.Sort{
+			Field: body.Sort.Field,
+			Order: body.Sort.Order,
+		}
+	}
+
 	articles, err := a.server.GetArticlesByFilter(context.Background(), &model.ArticleFilter{
+		Filter: filter,
+		Sort:   sort,
+		Pagination: model.Pagination{
+			Limit:  body.Pagination.Limit,
+			Offset: body.Pagination.Offset,
+		},
 	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -59,6 +85,6 @@ func (a *ArticleAPI) GetArticlesByFilter(w http.ResponseWriter, r *http.Request)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	if _, err := w.Write(data); err != nil {
-		a.logger.Error("failed to write to response", err)
+		a.logger.Error("failed to write to response", slog.String("error", err.Error()))
 	}
 }

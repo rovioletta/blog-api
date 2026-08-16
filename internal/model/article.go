@@ -30,6 +30,6 @@ type Sort struct {
 
 type ArticleFilter struct {
 	Filter     *ParamsFilter
-	Pagination *Pagination
-	Sort       []Sort
+	Pagination Pagination
+	Sort       *Sort
 }
