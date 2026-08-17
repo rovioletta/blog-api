@@ -12,12 +12,12 @@ import (
 )
 
 type Filter struct {
-	SearchTitle string    `json:"search_title" validate:"min=3,max=100"`
-	SearchTags  []string  `json:"search_tags" validate:"max=5,unique,dive,alphanum,min=3,max=20"`
-	CreatedFrom time.Time `json:"created_from"`
-	CreatedTo   time.Time `json:"created_to"`
-	UpdatedFrom time.Time `json:"updated_from"`
-	UpdatedTo   time.Time `json:"updated_to"`
+	SearchTitle *string    `json:"search_title" validate:"omitempty,min=3,max=100"`
+	SearchTags  []string   `json:"search_tags" validate:"max=5,unique,dive,alphanum,min=3,max=20"`
+	CreatedFrom *time.Time `json:"created_from"`
+	CreatedTo   *time.Time `json:"created_to"`
+	UpdatedFrom *time.Time `json:"updated_from"`
+	UpdatedTo   *time.Time `json:"updated_to"`
 }
 
 type Pagination struct {
@@ -26,14 +26,14 @@ type Pagination struct {
 }
 
 type Sort struct {
-	Field string `json:"field" validate:"required,oneof=title created_at updated_at"`
-	Order string `json:"order" validate:"required,oneof=asc desc"`
+	Field *string `json:"field" validate:"required,oneof=title created_at updated_at"`
+	Order *string `json:"order" validate:"required,oneof=asc desc"`
 }
 
 type GetArticlesByFilterRequestBody struct {
-	Filter     *Filter    `json:"filter"`
-	Pagination Pagination `json:"pagination" validate:"required"`
-	Sort       *Sort      `json:"sort"`
+	Filter     *Filter     `json:"filter"`
+	Pagination *Pagination `json:"pagination" validate:"required"`
+	Sort       *Sort       `json:"sort"`
 }
 
 func (a *ArticleAPI) GetArticlesByFilter(w http.ResponseWriter, r *http.Request) {
@@ -63,13 +63,18 @@ func (a *ArticleAPI) GetArticlesByFilter(w http.ResponseWriter, r *http.Request)
 		}
 	}
 
-	articles, err := a.server.GetArticlesByFilter(context.Background(), &model.ArticleFilter{
-		Filter: filter,
-		Sort:   sort,
-		Pagination: model.Pagination{
+	var pagination *model.Pagination
+	if body.Pagination != nil {
+		pagination = &model.Pagination{
 			Limit:  body.Pagination.Limit,
 			Offset: body.Pagination.Offset,
-		},
+		}
+	}
+
+	articles, err := a.server.GetArticlesByFilter(context.Background(), &model.ArticleFilter{
+		Filter:     filter,
+		Sort:       sort,
+		Pagination: pagination,
 	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

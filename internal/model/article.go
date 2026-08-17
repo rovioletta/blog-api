@@ -10,12 +10,12 @@ type Article struct {
 }
 
 type ParamsFilter struct {
-	SearchTitle string
+	SearchTitle *string
 	SearchTags  []string
-	CreatedFrom time.Time
-	CreatedTo   time.Time
-	UpdatedFrom time.Time
-	UpdatedTo   time.Time
+	CreatedFrom *time.Time
+	CreatedTo   *time.Time
+	UpdatedFrom *time.Time
+	UpdatedTo   *time.Time
 }
 
 type Pagination struct {
@@ -24,12 +24,12 @@ type Pagination struct {
 }
 
 type Sort struct {
-	Field string
-	Order string
+	Field *string
+	Order *string
 }
 
 type ArticleFilter struct {
 	Filter     *ParamsFilter
-	Pagination Pagination
+	Pagination *Pagination
 	Sort       *Sort
 }

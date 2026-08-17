@@ -11,7 +11,7 @@ import (
 type CreateArticleRequestBody struct {
 	Title   string   `json:"title" validate:"required,min=3,max=100"`
 	Content string   `json:"content" validate:"required"`
-	Tags    []string `json:"tags" validate:"max=5,unique,dive,alphanum,min=3,max=20"`
+	Tags    []string `json:"tags" validate:"max=5,unique,dive,tag_chars,min=3,max=20"`
 }
 
 func (a *ArticleAPI) CreateArticle(w http.ResponseWriter, r *http.Request) {

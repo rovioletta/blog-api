@@ -17,22 +17,22 @@ FROM
   article
 WHERE
   -- by title
-  ($1::text IS NULL OR title LIKE $1::text)
+  ($1::text IS NULL OR title LIKE CONCAT('%', $1::text, '%'))
   
   -- by tags
   AND (
     $2::text[] IS NULL 
-    OR cardinality($2::text[]) = 0 
-    OR tags && $2::text[]
+    OR cardinality($2) = 0 
+    OR tags && $2
   )
   
   -- by created_at
-  AND ($3::timestamp IS NULL OR created_at >= $3::timestamp)
-  AND ($4::timestamp IS NULL OR created_at <= $4::timestamp)
+  AND ($3::timestamp IS NULL OR created_at >= $3)
+  AND ($4::timestamp IS NULL OR created_at <= $4)
   
   -- by updated_at
-  AND ($5::timestamp IS NULL OR updated_at >= $5::timestamp)
-  AND ($6::timestamp IS NULL OR updated_at <= $6::timestamp)
+  AND ($5::timestamp IS NULL OR updated_at >= $5)
+  AND ($6::timestamp IS NULL OR updated_at <= $6)
 ORDER BY
   -- by title
   CASE WHEN $7::text = 'title' AND $8::text = 'asc' THEN title END ASC,
@@ -53,16 +53,16 @@ LIMIT
 `
 
 type GetArticlesByFilterParams struct {
-	FilterSearchTitle string
+	FilterSearchTitle *string
 	FilterSearchTags  []string
-	FilterCreatedFrom time.Time
-	FilterCreatedTo   time.Time
-	FilterUpdatedFrom time.Time
-	FilterUpdatedTo   time.Time
-	OrderByField      string
-	OrderType         string
-	OffsetPage        uint64
-	LimitPage         uint64
+	FilterCreatedFrom *time.Time
+	FilterCreatedTo   *time.Time
+	FilterUpdatedFrom *time.Time
+	FilterUpdatedTo   *time.Time
+	OrderByField      *string
+	OrderType         *string
+	Offset            uint64
+	Limit             uint64
 }
 
 func (q *Queries) GetArticlesByFilter(ctx context.Context, arg *GetArticlesByFilterParams) ([]Article, error) {
@@ -75,8 +75,8 @@ func (q *Queries) GetArticlesByFilter(ctx context.Context, arg *GetArticlesByFil
 		arg.FilterUpdatedTo,
 		arg.OrderByField,
 		arg.OrderType,
-		arg.OffsetPage,
-		arg.LimitPage,
+		arg.Offset,
+		arg.Limit,
 	)
 	if err != nil {
 		return nil, err
