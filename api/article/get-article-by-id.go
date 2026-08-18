@@ -19,7 +19,7 @@ func (a *ArticleAPI) GetArticleByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	article, err := a.server.GetArticlesByID(context.Background(), id)
+	article, err := a.server.GetArticleByID(context.Background(), id)
 	if errors.Is(err, model.ErrNoData) {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return

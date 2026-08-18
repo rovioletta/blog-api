@@ -10,7 +10,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (s *ArticleService) GetArticlesByID(ctx context.Context, id uint64) (*model.Article, error) {
+func (s *ArticleService) GetArticleByID(ctx context.Context, id uint64) (*model.Article, error) {
 	raw, err := s.db.GetArticleByID(ctx, id)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, model.ErrNoData

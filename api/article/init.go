@@ -12,7 +12,8 @@ import (
 type ArticleServiceInterface interface {
 	CreateArticle(ctx context.Context, article *model.Article) error
 	GetArticlesByFilter(ctx context.Context, filter *model.ArticleFilter) ([]model.Article, error)
-	GetArticlesByID(ctx context.Context, id uint64) (*model.Article, error)
+	GetArticleByID(ctx context.Context, id uint64) (*model.Article, error)
+	DeleteArticleByID(ctx context.Context, id uint64) error
 }
 
 type ArticleAPI struct {
