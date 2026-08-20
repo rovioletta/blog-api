@@ -3,10 +3,12 @@ package model
 import "time"
 
 type Article struct {
-	ID      uint64
-	Title   string
-	Content string
-	Tags    []string
+	ID        uint64
+	Title     *string
+	Content   *string
+	Tags      []string
+	CreatedAt *time.Time
+	UpdatedAt *time.Time
 }
 
 type ParamsFilter struct {

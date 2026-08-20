@@ -10,8 +10,8 @@ import (
 
 func (s *ArticleService) CreateArticle(ctx context.Context, article *model.Article) error {
 	err := s.db.CreateArticle(ctx, &db.CreateArticleParams{
-		Title:   article.Title,
-		Content: article.Content,
+		Title:   *article.Title,
+		Content: *article.Content,
 		Tags:    article.Tags,
 	})
 

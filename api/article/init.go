@@ -14,6 +14,7 @@ type ArticleServiceInterface interface {
 	GetArticlesByFilter(ctx context.Context, filter *model.ArticleFilter) ([]model.Article, error)
 	GetArticleByID(ctx context.Context, id uint64) (*model.Article, error)
 	DeleteArticleByID(ctx context.Context, id uint64) error
+	UpdateArticle(ctx context.Context, article *model.Article) error
 }
 
 type ArticleAPI struct {

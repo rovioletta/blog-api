@@ -22,8 +22,8 @@ func (a *ArticleAPI) CreateArticle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = a.server.CreateArticle(context.Background(), &model.Article{
-		Title:   body.Title,
-		Content: body.Content,
+		Title:   &body.Title,
+		Content: &body.Content,
 		Tags:    body.Tags,
 	})
 	if err != nil {

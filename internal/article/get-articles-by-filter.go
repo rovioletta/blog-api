@@ -44,10 +44,12 @@ func (s *ArticleService) GetArticlesByFilter(ctx context.Context, filter *model.
 
 	for _, a := range raw {
 		articles = append(articles, model.Article{
-			ID:      a.ID,
-			Title:   a.Title,
-			Content: a.Content,
-			Tags:    a.Tags,
+			ID:        a.ID,
+			Title:     &a.Title,
+			Content:   &a.Content,
+			Tags:      a.Tags,
+			CreatedAt: a.CreatedAt,
+			UpdatedAt: a.UpdatedAt,
 		})
 	}
 

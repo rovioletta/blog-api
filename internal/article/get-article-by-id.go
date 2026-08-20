@@ -21,9 +21,11 @@ func (s *ArticleService) GetArticleByID(ctx context.Context, id uint64) (*model.
 	}
 
 	return &model.Article{
-		ID:      raw.ID,
-		Title:   raw.Title,
-		Content: raw.Content,
-		Tags:    raw.Tags,
+		ID:        raw.ID,
+		Title:     &raw.Title,
+		Content:   &raw.Content,
+		Tags:      raw.Tags,
+		CreatedAt: raw.CreatedAt,
+		UpdatedAt: raw.UpdatedAt,
 	}, nil
 }
